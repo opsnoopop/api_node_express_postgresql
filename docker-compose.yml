@@ -1,0 +1,53 @@
+services:
+  node:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: node:24_alpine_express
+    container_name: container_node_express
+    ports:
+      - "3000:3000"
+    depends_on:
+      - database
+    environment:
+      - PORT=3000
+    networks:
+      network_node_express:
+        ipv4_address: 172.16.0.11
+
+  database:
+    image: postgres:14.18
+    container_name: container_postgresql
+    restart: always
+    shm_size: 128mb
+    environment:
+      POSTGRES_USER: testuser
+      POSTGRES_PASSWORD: testpass
+      POSTGRES_DB: testdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgresql:/var/lib/postgresql/data
+    networks:
+      network_node_express:
+        ipv4_address: 172.16.0.12
+
+  adminer:
+    image: adminer:5-standalone
+    container_name: container_adminer
+    restart: always
+    ports:
+      - 8080:8080
+    depends_on:
+      - database
+    networks:
+      network_node_express:
+        ipv4_address: 172.16.0.13
+
+networks:
+  network_node_express:
+    name: global_node_express
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.0.0/24
