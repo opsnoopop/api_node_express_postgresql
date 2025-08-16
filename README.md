@@ -1,11 +1,11 @@
-# Node.js Express API with MySQL
+# Node Express API with PostgreSQL
 
-A simple Node.js Express API application using Express and MySQL, containerized with Docker.
+A simple Node Express API application and PostgreSQL, containerized with Docker.
 
 
 ## Technology Stack
 
-**Node.js Container: FROM node:24.3-alpine**
+**Node Container: FROM node:24.3-alpine**
 - OS Alpine Linux: 3.22.0
 - Node.js: 24.3.0
 - dotenv: 17.2.1 # npm install dotenv
@@ -259,15 +259,13 @@ docker run \
 ### Truncate table users
 ```bash
 docker exec -i container_postgresql sh -c "PGPASSWORD='testpass' psql -U testuser -d testdb -c '
-Truncate testdb.users;
-"
+Truncate testdb.users;"
 ```
 
 ### Delete table users
 ```bash
 docker exec -i container_postgresql sh -c "PGPASSWORD='testpass' psql -U testuser -d testdb -c '
-DELETE FROM testdb.users;
-"
+DELETE FROM testdb.users;"
 ```
 
 ### Stop the Application
