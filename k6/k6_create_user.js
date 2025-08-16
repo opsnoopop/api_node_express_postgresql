@@ -27,7 +27,7 @@ export default function () {
   // POST
   let body = {
     "username":"optest",
-    "email":"auttakorn.w@clicknext.com"
+    "email":"opsnoopop@hotmail.com"
   };
   let res = http.post("http://container_node:3000/users", JSON.stringify(body), headers);
 

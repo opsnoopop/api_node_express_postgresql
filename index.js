@@ -1,3 +1,4 @@
+import 'dotenv/config'
 import express from 'express'
 import postgres from 'postgres'
 
@@ -8,11 +9,11 @@ app.use(express.json()) // ต้องใช้ก่อน POST
 
 // สร้าง PostgreSQL client (auto pool ในตัว)
 const sql = postgres({
-  host: 'container_postgresql',   // ชื่อ container หรือ hostname
-  port: 5432,
-  database: 'testdb',
-  username: 'testuser',
-  password: 'testpass',
+  host: process.env.DB_HOST,
+  username: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port: Number(process.env.DB_PORT || 5432),
   max: 10,                        // connection limit
   idle_timeout: 30,               // วินาที (ไม่ใช่ ms)
   connect_timeout: 60,            // วินาที

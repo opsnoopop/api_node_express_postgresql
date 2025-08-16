@@ -8,7 +8,8 @@ A simple Node.js Express API application using Express and MySQL, containerized 
 **Node.js Container: FROM node:24.3-alpine**
 - OS Alpine Linux: 3.22.0
 - Node.js: 24.3.0
-- Express: 5.1.0 # npm install express
+- dotenv: 17.2.1 # npm install dotenv
+- express: 5.1.0 # npm install express
 - postgres: 3.4.7 # npm install postgres
 
 **PostgreSQL Container: FROM postgres:14.18**
@@ -72,7 +73,7 @@ CREATE TABLE IF NOT EXISTS public.users (
 ```json
 {
   "username":"optest",
-  "email":"auttakorn.w@clicknext.com"
+  "email":"opsnoopop@hotmail.com"
 }
 ```
 - **Response:**
@@ -91,7 +92,7 @@ CREATE TABLE IF NOT EXISTS public.users (
 {
   "user_id":1,
   "username":"optest",
-  "email":"auttakorn.w@clicknext.com"
+  "email":"opsnoopop@hotmail.com"
 }
 ```
 
