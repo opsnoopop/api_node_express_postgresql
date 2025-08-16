@@ -8,12 +8,12 @@ A simple Node.js Express API application using Express and MySQL, containerized 
 **Node.js Container: FROM node:24.3-alpine**
 - OS Alpine Linux: 3.22.0
 - Node.js: 24.3.0
-- Express: 4.21.2
-- pg: 8.11.3
+- Express: 5.1.0 # npm install express
+- postgres: 3.4.7 # npm install postgres
 
 **PostgreSQL Container: FROM postgres:14.18**
 - OS Debian GNU/Linux 12 (bookworm): 12
-- PostgreSQL: 14.18
+- PostgreSQL: 17.5
 
 **Adminer Container: FROM adminer:5-standalone**
 - OS Alpine Linux: 3.22.1
@@ -21,7 +21,7 @@ A simple Node.js Express API application using Express and MySQL, containerized 
 
 **Grafana/k6 Container: FROM grafana/k6:1.1.0**
 - OS Alpine Linux: 3.22.0
-- grafana/k6: 1.1.0
+- Grafana/k6: 1.1.0
 
 
 ## Getting Started
@@ -49,8 +49,7 @@ CREATE TABLE IF NOT EXISTS public.users (
   username VARCHAR(50) NOT NULL,
   email VARCHAR(100) NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
-'"
+);'"
 ```
 
 
@@ -97,6 +96,114 @@ CREATE TABLE IF NOT EXISTS public.users (
 ```
 
 
+## Test Performance by sysbench
+
+### sysbench e.g.
+```text
+step 1 prepare
+step 2 run test someting
+step 3 cleanup
+
+sysbench \
+...
+oltp_read_write prepare; # step 1 prepare สร้าง table
+
+sysbench \
+...
+oltp_read_write run;     # step 2 run test อ่าน เขียน พร้อมกัน
+
+sysbench \
+...
+oltp_read_only run;      # step 2 run test อ่าน อย่างเดียว
+
+sysbench \
+...
+oltp_write_only run;     # step 2 run test เขียน อย่างเดียว
+
+sysbench \
+...
+oltp_update_index run;   # step 2 run test update index
+
+sysbench \
+...
+oltp_point_select run;   # step 2 run test query แบบเลือก row เดียว
+
+sysbench \
+...
+oltp_delete run;         # step 2 run test delete rows
+
+sysbench \
+...
+oltp_read_write cleanup; # step 3 cleanup ลบ table
+```
+
+### sysbench step 1 prepare
+```bash
+docker run \
+--name container_ubuntu_tool \
+--rm \
+-it \
+--network global_node \
+opsnoopop/ubuntu-tool:1.0 \
+sysbench \
+--threads=2 \
+--time=10 \
+--db-driver="pgsql" \
+--pgsql-host="container_postgresql" \
+--pgsql-port=5432 \
+--pgsql-user="testuser" \
+--pgsql-password="testpass" \
+--pgsql-db="testdb" \
+--tables=10 \
+--table-size=100000 \
+oltp_read_write prepare;
+```
+
+### sysbench step 2 run test
+```bash
+docker run \
+--name container_ubuntu_tool \
+--rm \
+-it \
+--network global_node \
+opsnoopop/ubuntu-tool:1.0 \
+sysbench \
+--threads=2 \
+--time=10 \
+--db-driver="pgsql" \
+--pgsql-host="container_postgresql" \
+--pgsql-port=5432 \
+--pgsql-user="testuser" \
+--pgsql-password="testpass" \
+--pgsql-db="testdb" \
+--tables=10 \
+--table-size=100000 \
+oltp_read_write run > sysbench_raw_$(date +"%Y%m%d_%H%M%S").txt
+```
+
+### sysbench step 3 cleanup
+```bash
+docker run \
+--name container_ubuntu_tool \
+--rm \
+-it \
+--network global_node \
+opsnoopop/ubuntu-tool:1.0 \
+sysbench \
+--threads=2 \
+--time=10 \
+--db-driver="pgsql" \
+--pgsql-host="container_postgresql" \
+--pgsql-port=5432 \
+--pgsql-user="testuser" \
+--pgsql-password="testpass" \
+--pgsql-db="testdb" \
+--tables=10 \
+--table-size=100000 \
+oltp_read_write cleanup;
+```
+
+
 ## Test Performance by grafana/k6
 
 ### grafana/k6 test Health Check
@@ -105,10 +212,10 @@ docker run \
 --name container_k6 \
 --rm \
 -it \
---network global_node_express \
+--network global_node \
 -v ./k6/:/k6 \
 grafana/k6:1.1.0 \
-run /k6/k6_node_express_health_check.js
+run /k6/k6_health_check.js
 ```
 
 ### grafana/k6 test Insert Create user
@@ -117,10 +224,10 @@ docker run \
 --name container_k6 \
 --rm \
 -it \
---network global_node_express \
+--network global_node \
 -v ./k6/:/k6 \
 grafana/k6:1.1.0 \
-run /k6/k6_node_express_create_user.js
+run /k6/k6_create_user.js
 ```
 
 ### grafana/k6 test Select Get user by id
@@ -129,10 +236,10 @@ docker run \
 --name container_k6 \
 --rm \
 -it \
---network global_node_express \
+--network global_node \
 -v ./k6/:/k6 \
 grafana/k6:1.1.0 \
-run /k6/k6_node_express_get_user_by_id.js
+run /k6/k6_get_user_by_id.js
 ```
 
 ### check entrypoint grafana/k6

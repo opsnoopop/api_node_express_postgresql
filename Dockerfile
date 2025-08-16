@@ -15,4 +15,5 @@ COPY . .
 EXPOSE 3000
 
 # คำสั่งรันแอป
+# npm start
 CMD ["npm", "start"]
