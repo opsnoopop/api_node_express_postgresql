@@ -216,7 +216,7 @@ docker run \
 --network global_node \
 -v ./k6/:/k6 \
 grafana/k6:1.1.0 \
-run /k6/k6_health_check.js
+run /k6/k6_1_ramping_health_check.js
 ```
 
 ### grafana/k6 test Insert Create user
@@ -228,7 +228,7 @@ docker run \
 --network global_node \
 -v ./k6/:/k6 \
 grafana/k6:1.1.0 \
-run /k6/k6_create_user.js
+run /k6/k6_2_ramping_create_user.js
 ```
 
 ### grafana/k6 test Select Get user by id
@@ -240,7 +240,7 @@ docker run \
 --network global_node \
 -v ./k6/:/k6 \
 grafana/k6:1.1.0 \
-run /k6/k6_get_user_by_id.js
+run /k6/k6_3_ramping_get_user_by_id.js
 ```
 
 ### check entrypoint grafana/k6
@@ -259,13 +259,13 @@ docker run \
 ### Truncate table users
 ```bash
 docker exec -i container_postgresql sh -c "PGPASSWORD='testpass' psql -U testuser -d testdb -c '
-Truncate testdb.users;"
+Truncate public.users RESTART IDENTITY;'"
 ```
 
 ### Delete table users
 ```bash
 docker exec -i container_postgresql sh -c "PGPASSWORD='testpass' psql -U testuser -d testdb -c '
-DELETE FROM testdb.users;"
+DELETE FROM public.users;'"
 ```
 
 ### Stop the Application
