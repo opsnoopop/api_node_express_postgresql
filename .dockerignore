@@ -6,5 +6,7 @@ Dockerfile
 README.md
 docker-compose.yml
 k6/
-postgresql/
 node_modules/
+postgresql/
+postgresql_initdb/
+test*.sh
