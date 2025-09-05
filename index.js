@@ -21,7 +21,7 @@ const sql = postgres({
 
 // root route
 app.get('/', (req, res) => {
-  res.status(200).json({ message: 'Hello World from Node' })
+  res.status(200).json({ message: 'Hello World from Node (Express + PostgreSQL)' })
 })
 
 // สร้างผู้ใช้ใหม่
